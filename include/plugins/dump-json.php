@@ -1,55 +1,61 @@
 <?php
 
-/** Dump to XML format in structure <database name=""><table name=""><column name="">value
+/** Dump to JSON format
 * @link https://www.adminer.org/plugins/#use
 * @author Jakub Vrana, http://www.vrana.cz/
 * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License, version 2 (one or other)
 */
-class AdminerDumpXml {
+class AdminerDumpJson {
 	/** @access protected */
 	var $database = false;
 	
 	function dumpFormat() {
-		return array('xml' => 'XML');
+		return array('json' => 'JSON');
 	}
 
 	function dumpTable($table, $style, $is_view = false) {
-		if ($_POST['format'] == 'xml') {
+		if ($_POST['format'] == 'json') {
 			return true;
 		}
 	}
 	
 	function _database() {
-		echo "</database>\n";
+		echo "}\n";
 	}
 	
 	function dumpData($table, $style, $query) {
-		if ($_POST['format'] == 'xml') {
-			if (!$this->database) {
+		if ($_POST['format'] == 'json') {
+			if ($this->database) {
+				echo ",\n";
+			} else {
 				$this->database = true;
-				echo "<database name='" . h(DB) . "'>\n";
+				echo "{\n";
 				register_shutdown_function(array($this, '_database'));
 			}
 			$connection = connection();
 			$result = $connection->query($query, 1);
 			if ($result) {
+				echo '"' . addcslashes($table, "\r\n\"\\") . "\": [\n";
+				$first = true;
 				while ($row = $result->fetch_assoc()) {
-					echo "\t<table name='" . h($table) . "'>\n";
+					echo ($first ? '' : ', ');
+					$first = false;
 					foreach ($row as $key => $val) {
-						echo "\t\t<column name='" . h($key) . "'" . (isset($val) ? '' : " null='null'") . '>' . h($val) . "</column>\n";
+						json_row($key, $val);
 					}
-					echo "\t</table>\n";
+					json_row('');
 				}
+				echo ']';
 			}
 			return true;
 		}
 	}
 
 	function dumpHeaders($identifier, $multi_table = false) {
-		if ($_POST['format'] == 'xml') {
-			header('Content-Type: text/xml; charset=utf-8');
-			return 'xml';
+		if ($_POST['format'] == 'json') {
+			header('Content-Type: application/json; charset=utf-8');
+			return 'json';
 		}
 	}
 

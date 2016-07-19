@@ -17,41 +17,25 @@
  * @version             $Id $
  **/
 
-// connect xoops database
-defined('XOOPS_ROOT_PATH') || include dirname(dirname(__DIR__)) . '/mainfile.php';
-
-$moduleDirName = basename(__DIR__);
-include(XOOPS_ROOT_PATH . '/header.php');
+// connect xoops database 
+include_once __DIR__ . '/admin_header.php';
+xoops_cp_header();
 
 if (!is_object($xoopsUser) || !is_object($xoopsModule) || !$xoopsUser->isAdmin($xoopsModule->mid())) {
     exit(_NOPERM);
 }
-function adminer_object()
-{
-    class AdminerKfr extends Adminer
-    {
-        public function name()
-        {
-            return 'XOOPS Admin';
-        }
 
-        public function credentials()
-        {
-            return array(XOOPS_DB_HOST, XOOPS_DB_USER, XOOPS_DB_PASS);
-        }
+$aboutAdmin = new ModuleAdmin();
+echo $aboutAdmin->addNavigation(basename(__FILE__));
 
-        public function database()
-        {
-            return XOOPS_DB_NAME;
-        }
+echo '<table width="100%" class="outer">';
+echo '<tr>';
+echo '<td align="center">';
+echo '</td>';
+echo '</tr>';
+echo '<tr>';
+echo '<td><iframe src="' . XOOPS_URL . '/modules/adminer/admin/getBigdump.php" scrolling="auto" frameborder="1" width="100%" height="1024"></iframe></td>';
+echo '</tr>';
+echo '</table>';
 
-        public function login($login, $password)
-        {
-            return ($login == XOOPS_DB_USER);
-        }
-    }
-
-    return new AdminerKfr;
-}
-
-include __DIR__ . '/include/editor.php';
+include_once __DIR__ . '/admin_footer.php';

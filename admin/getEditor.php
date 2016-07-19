@@ -16,18 +16,38 @@
  * @author               Kris <http://www.xoofoo.org>
  * @version              $Id $
  **/
-// connect xoops database 
-defined('XOOPS_ROOT_PATH') || include dirname(dirname(__DIR__)) . '/mainfile.php';
+// connect xoops database
+include_once __DIR__ . '/admin_header.php';
 
-$moduleDirName = basename(__DIR__);
-include(XOOPS_ROOT_PATH . '/header.php');
 if (!is_object($xoopsUser) || !is_object($xoopsModule) || !$xoopsUser->isAdmin($xoopsModule->mid())) {
     exit(_NOPERM);
 }
 
 function adminer_object()
 {
-    class AdminerKfr extends Adminer
+    // required to run any plugin
+    include_once dirname(__DIR__) . '/include/plugins/plugin.php';
+    //    include_once dirname(__DIR__) . "/include/plugins/plugin.php";
+    include_once dirname(__DIR__) . '/include/plugins/frames.php';
+
+    // autoloader
+    //    foreach (glob("plugins/*.php") as $filename) {
+    //        include_once "./$filename";
+    //    }
+
+    $plugins = array(
+        // specify enabled plugins here
+        //        new AdminerDumpXml,
+        //        new AdminerTinymce,
+        //        new AdminerFileUpload("data/"),
+        //        new AdminerSlugify,
+        //        new AdminerTranslation,
+        //        new AdminerForeignSystem,
+        new AdminerFrames,
+    );
+
+    //    It is possible to combine customization and plugins:
+    class AdminerCustomization extends AdminerPlugin
     {
         public function name()
         {
@@ -50,33 +70,8 @@ function adminer_object()
         }
     }
 
-    return new AdminerKfr;
+    return new AdminerCustomization($plugins);
 }
 
-/*
-function adminer_object() {
-    include_once "./include/plugins/plugin.php";
-    foreach (glob("include/plugins/*.php") as $filename) {
-        include_once "./$filename";
-    }
-    $plugins = array(
-        new AdminerDumpBz2,
-        new AdminerDumpJson,
-        new AdminerDumpZip,
-        new AdminerDumpXml,
-        new AdminerEditCalendar,
-        new AdminerFasterTablesFilter,
-        new AdminerFrames,
-        new AdminerLoginServers,
-        new AdminerLoginTable,
-        new AdminerVersionNoverify,
-        new AdminerTinymce,
-        new AdminerFileUpload("data/"),
-        new AdminerSlugify,
-        new AdminerTranslation,
-        new AdminerForeignSystem,
-    );
-    return new AdminerPlugin($plugins);
-}
-*/
-include __DIR__ . '/include/adminer.php';
+// include original Adminer or Adminer Editor
+include_once dirname(__DIR__) . '/include/editor.php';
