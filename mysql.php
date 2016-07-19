@@ -9,47 +9,67 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @copyright           The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license             http://www.fsf.org/copyleft/gpl.html GNU public license
- * @package          	Adminer Module
- * @since               2.3.0
- * @author              Kris <http://www.xoofoo.org>
- * @version             $Id $
-**/
+ * @copyright            The XOOPS Project http://sourceforge.net/projects/xoops/
+ * @license              http://www.fsf.org/copyleft/gpl.html GNU public license
+ * @package              Adminer Module
+ * @since                2.3.0
+ * @author               Kris <http://www.xoofoo.org>
+ * @version              $Id $
+ **/
 // connect xoops database 
-if ( !include("../../mainfile.php") ) {
-    die("XOOPS root path not defined");
-}
-$module_dirname = basename( dirname( __FILE__ ) ) ;
-include(XOOPS_ROOT_PATH."/header.php");
-if ( !is_object($xoopsUser) || !is_object($xoopsModule) || !$xoopsUser->isAdmin($xoopsModule->mid()) ) exit( _NOPERM );
+defined('XOOPS_ROOT_PATH') || include dirname(dirname(__DIR__)) . '/mainfile.php';
 
+$moduleDirName = basename(__DIR__);
+include(XOOPS_ROOT_PATH . '/header.php');
+if (!is_object($xoopsUser) || !is_object($xoopsModule) || !$xoopsUser->isAdmin($xoopsModule->mid())) {
+    exit(_NOPERM);
+}
+
+function adminer_object()
+{
+    class AdminerKfr extends Adminer
+    {
+        public function name()
+        {
+            return 'XOOPS Admin';
+        }
+
+        public function credentials()
+        {
+            return array(XOOPS_DB_HOST, XOOPS_DB_USER, XOOPS_DB_PASS);
+        }
+
+        public function database()
+        {
+            return XOOPS_DB_NAME;
+        }
+
+        public function login($login, $password)
+        {
+            return ($login == XOOPS_DB_USER);
+        }
+    }
+
+    return new AdminerKfr;
+}
+
+/*
 function adminer_object() {
-	class AdminerKfr extends Adminer {
-		function name() {
-			return 'XOOPS Admin';
-		}
-		function credentials() {
-			return array(XOOPS_DB_HOST,XOOPS_DB_USER,XOOPS_DB_PASS);
-		}
-		function database() {
-			return XOOPS_DB_NAME;
-		}
-		function login($login, $password) {
-			return ($login == XOOPS_DB_USER);
-		}
-	}
-	return new AdminerKfr;
-}
-
-/*function adminer_object() {
     include_once "./include/plugins/plugin.php";
     foreach (glob("include/plugins/*.php") as $filename) {
         include_once "./$filename";
     }
     $plugins = array(
+        new AdminerDumpBz2,
+        new AdminerDumpJson,
         new AdminerDumpZip,
         new AdminerDumpXml,
+        new AdminerEditCalendar,
+        new AdminerFasterTablesFilter,
+        new AdminerFrames,
+        new AdminerLoginServers,
+        new AdminerLoginTable,
+        new AdminerVersionNoverify,
         new AdminerTinymce,
         new AdminerFileUpload("data/"),
         new AdminerSlugify,
@@ -57,6 +77,6 @@ function adminer_object() {
         new AdminerForeignSystem,
     );
     return new AdminerPlugin($plugins);
-}*/
-include "./include/adminer.php";
-?>
+}
+*/
+include __DIR__ . '/include/adminer.php';

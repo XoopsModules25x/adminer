@@ -11,17 +11,16 @@
  *
  * @copyright           The XOOPS Project http://sourceforge.net/projects/xoops/
  * @license             http://www.fsf.org/copyleft/gpl.html GNU public license
- * @package          	Adminer Module
+ * @package             Adminer Module
  * @since               2.3.0
  * @author              Kris <http://www.xoofoo.org>
  * @version             $Id $
-**/
+ **/
 
-// connect xoops database 
-if ( !include("../../mainfile.php") ) {
-    die("XOOPS root path not defined");
+defined('XOOPS_ROOT_PATH') || include dirname(dirname(__DIR__)) . '/mainfile.php';
+
+if (!is_object($xoopsUser) || !is_object($xoopsModule) || !$xoopsUser->isAdmin($xoopsModule->mid())) {
+    exit(_NOPERM);
 }
-if ( !is_object($xoopsUser) || !is_object($xoopsModule) || !$xoopsUser->isAdmin($xoopsModule->mid()) ) exit( _NOPERM );
-include(XOOPS_ROOT_PATH."/header.php");
-include "./include/bigdump.php";
-?>
+include(XOOPS_ROOT_PATH . '/header.php');
+include __DIR__ . '/include/bigdump.php';

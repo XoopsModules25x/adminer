@@ -11,37 +11,47 @@
  *
  * @copyright           The XOOPS Project http://sourceforge.net/projects/xoops/
  * @license             http://www.fsf.org/copyleft/gpl.html GNU public license
- * @package          	Adminer Module
+ * @package             Adminer Module
  * @since               2.3.0
  * @author              Kris <http://www.xoofoo.org>
  * @version             $Id $
-**/
+ **/
 
-// connect xoops database 
-// connect xoops database 
-if ( !include("../../mainfile.php") ) {
-    die("XOOPS root path not defined");
+// connect xoops database
+defined('XOOPS_ROOT_PATH') || include dirname(dirname(__DIR__)) . '/mainfile.php';
+
+$moduleDirName = basename(__DIR__);
+include(XOOPS_ROOT_PATH . '/header.php');
+
+if (!is_object($xoopsUser) || !is_object($xoopsModule) || !$xoopsUser->isAdmin($xoopsModule->mid())) {
+    exit(_NOPERM);
 }
-$module_dirname = basename( dirname( __FILE__ ) ) ;
-include(XOOPS_ROOT_PATH."/header.php");
-if ( !is_object($xoopsUser) || !is_object($xoopsModule) || !$xoopsUser->isAdmin($xoopsModule->mid()) ) exit( _NOPERM );
-if ( !is_object($xoopsUser) || !is_object($xoopsModule) || !$xoopsUser->isAdmin($xoopsModule->mid()) ) exit( _NOPERM );
-function adminer_object() {
-	class AdminerKfr extends Adminer {
-		function name() {
-			return 'XOOPS Admin';
-		}
-		function credentials() {
-			return array(XOOPS_DB_HOST,XOOPS_DB_USER,XOOPS_DB_PASS);
-		}
-		function database() {
-			return XOOPS_DB_NAME;
-		}
-		function login($login, $password) {
-			return ($login == XOOPS_DB_USER);
-		}
-	}
-	return new AdminerKfr;
+function adminer_object()
+{
+    class AdminerKfr extends Adminer
+    {
+        public function name()
+        {
+            return 'XOOPS Admin';
+        }
+
+        public function credentials()
+        {
+            return array(XOOPS_DB_HOST, XOOPS_DB_USER, XOOPS_DB_PASS);
+        }
+
+        public function database()
+        {
+            return XOOPS_DB_NAME;
+        }
+
+        public function login($login, $password)
+        {
+            return ($login == XOOPS_DB_USER);
+        }
+    }
+
+    return new AdminerKfr;
 }
-include "./include/editor.php";
-?>
+
+include __DIR__ . '/include/editor.php';
